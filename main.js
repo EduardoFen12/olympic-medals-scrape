@@ -1,3 +1,23 @@
+// 1. Função para converter o array em CSV
+function convertArrayToCSV(array) {
+	const headers = Object.keys(array[0]);
+	const rows = array.map(obj => headers.map(header => obj[header]).join(","));
+	return [headers.join(","), ...rows].join("\n");
+}
+
+// 2. Função para baixar o CSV
+function downloadCSV(csvContent, filename = 'quadroDeMedalhasOlimpiadas2024.csv') {
+	const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+	const link = document.createElement("a");
+	const url = URL.createObjectURL(blob);
+	link.setAttribute("href", url);
+	link.setAttribute("download", filename);
+	link.style.visibility = 'hidden';
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+}
+
 async function init() {
 	try {
 		
@@ -13,6 +33,9 @@ async function init() {
 		let listaOuros   = [];
 		let listaPratas  = [];
 		let listaBronzes = [];
+		let listaTotais  = [];
+
+		let listaCsv     = [];
 
 		const jsonMedalhas = JSON.parse(
 			document.querySelector("#__NEXT_DATA__").textContent
@@ -29,9 +52,9 @@ async function init() {
 					listaOuros.push(element["gold"]);
 					listaPratas.push(element["silver"]);
 					listaBronzes.push(element["bronze"]);
+					listaTotais.push(element["total"]);
 				}
 			});
-		
 		}
 
 		const data = [
@@ -39,7 +62,7 @@ async function init() {
 				x: listaPaises,
 				y: listaOuros,
 				type: "bar",
-				name: "OUro",
+				name: "Ouro",
 				marker: {
 					color: "#ffd700",
 				},
@@ -69,6 +92,17 @@ async function init() {
 		};
 
 		Plotly.newPlot("myDiv", data, layout);
+
+
+		for (var i = 0; i < listaPaises.length; i++) {
+			listaCsv.push({pais: listaPaises[i], ouro: listaOuros[i], prata: listaPratas[i], bronze: listaBronzes[i], total: listaTotais[i]})
+		}
+
+		// 3. Convertendo o array para CSV e baixando
+		const csvContent = convertArrayToCSV(listaCsv);
+		downloadCSV(csvContent, "quadroDeMedalhasOlimpiadas2024.csv");
+
+
 	} catch (error) {
 		console.error("Error fetching the HMTL: ", error);
 	}
