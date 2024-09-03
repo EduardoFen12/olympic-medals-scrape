@@ -94,8 +94,13 @@ async function init() {
 		Plotly.newPlot("myDiv", data, layout);
 
 
-		for (var i = 0; i < listaPaises.length; i++) {
-			listaCsv.push({pais: listaPaises[i], ouro: listaOuros[i], prata: listaPratas[i], bronze: listaBronzes[i], total: listaTotais[i]})
+		for (var i = 0; i < dados.length; i++) {
+			
+			dados[i].medalsNumber.forEach((element) => {
+				if(element['type'] === 'Total') {
+					listaCsv.push({pais: dados[i].longDescription, ouro: element["gold"], prata: element["silver"], bronze: element["bronze"], total: element["total"]})
+				}
+			});
 		}
 
 		// 3. Convertendo o array para CSV e baixando
