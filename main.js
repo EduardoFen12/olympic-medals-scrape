@@ -1,12 +1,18 @@
 async function init() {
 	try {
+		
 		const response = await fetch(
 			"https://olympics.com/pt/paris-2024/medalhas"
 		);
+
 		const html = await response.text();
 		const parser = new DOMParser();
 		const document = parser.parseFromString(html, "text/html");
-		let listaPaises = [];
+
+		let listaPaises  = [];
+		let listaOuros   = [];
+		let listaPratas  = [];
+		let listaBronzes = [];
 
 		const jsonMedalhas = JSON.parse(
 			document.querySelector("#__NEXT_DATA__").textContent
@@ -16,44 +22,44 @@ async function init() {
 			jsonMedalhas.props.pageProps.initialMedals.medalStandings
 				.medalsTable;
 
-		dados.forEach((element) => {
-			console.log(element.longDescription);
-			console.log(element.medalsNumber[0]);
-			console.log(element.medalsNumber[0]["total"]);
-		});
-
-		console.log(dados[0].medalsNumber[0]);
-
-		for (var i = 0; i < 10; i++) {
+		for (var i = 0; i < 30; i++) {
 			listaPaises.push(dados[i].longDescription);
+			dados[i].medalsNumber.forEach((element) => {
+				if(element['type'] === 'Total') {
+					listaOuros.push(element["gold"]);
+					listaPratas.push(element["silver"]);
+					listaBronzes.push(element["bronze"]);
+				}
+			});
+		
 		}
 
 		const data = [
 			{
 				x: listaPaises,
-				y: [12, 19, 3, 5, 2, 3, 7],
+				y: listaOuros,
 				type: "bar",
-				name: "Dataset 1",
+				name: "OUro",
 				marker: {
-					color: "#cd7f32", // Cor bronze claro
+					color: "#ffd700",
 				},
 			},
 			{
 				x: listaPaises,
-				y: [2, 29, 5, 5, 3, 3, 9],
+				y: listaPratas,
 				type: "bar",
-				name: "Dataset 2",
+				name: "Prata",
 				marker: {
-					color: "#C0C0C0", // Cor bronze claro
+					color: "#C0C0C0",
 				},
 			},
 			{
 				x: listaPaises,
-				y: [2, 29, 5, 5, 3, 3, 9],
+				y: listaBronzes,
 				type: "bar",
-				name: "Dataset 2",
+				name: "Bronze",
 				marker: {
-					color: "#ffd700", // Cor bronze claro
+					color: "#cd7f32",
 				},
 			},
 		];
