@@ -1,62 +1,71 @@
-
 async function init() {
-    try {
-        const response = await fetch(
-            "https://olympics.com/pt/paris-2024/medalhas"
-        );
-        const html                = await response.text();
-        const parser              = new DOMParser();
-        const document            = parser.parseFromString(html, "text/html");
-        let   listaMedalhasPaises = {};
+	try {
+		const response = await fetch(
+			"https://olympics.com/pt/paris-2024/medalhas"
+		);
+		const html = await response.text();
+		const parser = new DOMParser();
+		const document = parser.parseFromString(html, "text/html");
+		let listaPaises = [];
 
+		const jsonMedalhas = JSON.parse(
+			document.querySelector("#__NEXT_DATA__").textContent
+		);
 
-        console.log(document.querySelector('title').textContent);
+		const dados =
+			jsonMedalhas.props.pageProps.initialMedals.medalStandings
+				.medalsTable;
 
+		dados.forEach((element) => {
+			console.log(element.longDescription);
+			console.log(element.medalsNumber[0]);
+			console.log(element.medalsNumber[0]["total"]);
+		});
 
-        let medalhas = document.querySelectorAll('.emotion-srm-19huvme');
-        let textoMedalhas = [];
-        medalhas.forEach(medalha => {
-            textoMedalhas.push(medalha.textContent);
-        });
-        console.log(textoMedalhas);
+		console.log(dados[0].medalsNumber[0]);
 
+		for (var i = 0; i < 10; i++) {
+			listaPaises.push(dados[i].longDescription);
+		}
 
-        let totalMedalhas = document.querySelectorAll('.emotion-srm-bnzwbp');
-        let tetoTotalMedalhas = [];
-        totalMedalhas.forEach(total => {
-            tetoTotalMedalhas.push(total.textContent);
-        });
+		const data = [
+			{
+				x: listaPaises,
+				y: [12, 19, 3, 5, 2, 3, 7],
+				type: "bar",
+				name: "Dataset 1",
+				marker: {
+					color: "#cd7f32", // Cor bronze claro
+				},
+			},
+			{
+				x: listaPaises,
+				y: [2, 29, 5, 5, 3, 3, 9],
+				type: "bar",
+				name: "Dataset 2",
+				marker: {
+					color: "#C0C0C0", // Cor bronze claro
+				},
+			},
+			{
+				x: listaPaises,
+				y: [2, 29, 5, 5, 3, 3, 9],
+				type: "bar",
+				name: "Dataset 2",
+				marker: {
+					color: "#ffd700", // Cor bronze claro
+				},
+			},
+		];
 
-        console.log(tetoTotalMedalhas);
-        
+		const layout = {
+			barmode: "stack",
+		};
 
-        let paises = document.querySelectorAll('.emotion-srm-uu3d5n');
-        let textoPaises = [];
-        paises.forEach(pais => {
-            textoPaises.push(pais.textContent);
-        });
-
-        console.log(textoPaises);
-
-
-        while (textoMedalhas.length > 0 ) {
-            let nomePais       = textoPaises.splice(0, 1)[0];
-            let numeroMedalhas = textoMedalhas.splice(0, 3);
-            let numeroTotalMedalhas = tetoTotalMedalhas.splice(0, 1)[0];
-            listaMedalhasPaises[nomePais] = [];
-            listaMedalhasPaises[nomePais]["ouro"] = numeroMedalhas[0];
-            listaMedalhasPaises[nomePais]["prata"] = numeroMedalhas[1];
-            listaMedalhasPaises[nomePais]["bronze"] = numeroMedalhas[2];
-            listaMedalhasPaises[nomePais]["total"] = numeroTotalMedalhas;
-        };
-
-        console.log(listaMedalhasPaises);
-
-        // Por algum motivo, só está carregando 19 paises !!!!!!!!!!!!!!!!!!!.
-            
-    } catch (error) {
-        console.error("Error fetching the HMTL: ", error);
-    }
+		Plotly.newPlot("myDiv", data, layout);
+	} catch (error) {
+		console.error("Error fetching the HMTL: ", error);
+	}
 }
 
 init();
